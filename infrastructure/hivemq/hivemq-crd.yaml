@@ -1,0 +1,29 @@
+apiVersion: hivemq.com/v1
+kind: HiveMQCluster
+metadata:
+  name: hivemq-cluster1
+  namespace: hivemq
+spec:
+  hivemqVersion: 0.1.0
+  image: sbaier1/hivemq-k8s
+  imagePullPolicy: Always
+  nodeCount: 5
+  logLevel: INFO
+  mqtt:
+    maxQos: 2
+  monitoring:
+    enablePrometheus: true
+  memory: 6G
+  cpu: 2000m
+  configMaps:
+    - name: hivemq-license
+    - name: kafka-config
+  initialization:
+    - name: init-kafka-plugin
+      args:
+        - |
+          # Setup extension
+          wget https://www.hivemq.com/releases/extensions/hivemq-kafka-extension-1.0.0.zip
+          unzip hivemq-kafka-extension-1.0.0.zip -d /hivemq-data/extensions
+          rm /hivemq-data/extensions/hivemq-kafka-extension/kafka-configuration.example.xml
+          chmod -R 777 /hivemq-data/extensions/hivemq-kafka-extension
